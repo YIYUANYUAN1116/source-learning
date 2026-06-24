@@ -1,0 +1,21 @@
+target,concurrency,round,operation,score
+container-runc,1,1,System Call Overhead,100000
+container-runc,1,2,System Call Overhead,102000
+container-runc,2,1,System Call Overhead,185000
+container-runc,2,2,System Call Overhead,188000
+container-runc,4,1,System Call Overhead,310000
+container-runc,4,2,System Call Overhead,320000
+kata-qemu,1,1,System Call Overhead,90000
+kata-qemu,1,2,System Call Overhead,92000
+kata-qemu,2,1,System Call Overhead,150000
+kata-qemu,2,2,System Call Overhead,152000
+kata-qemu,4,1,System Call Overhead,220000
+kata-qemu,4,2,System Call Overhead,225000
+container-runc,1,1,File Copy 1024 bufsize 2000 maxblocks,5000
+container-runc,1,2,File Copy 1024 bufsize 2000 maxblocks,5100
+container-runc,2,1,File Copy 1024 bufsize 2000 maxblocks,9300
+container-runc,2,2,File Copy 1024 bufsize 2000 maxblocks,9400
+kata-qemu,1,1,File Copy 1024 bufsize 2000 maxblocks,4200
+kata-qemu,1,2,File Copy 1024 bufsize 2000 maxblocks,4300
+kata-qemu,2,1,File Copy 1024 bufsize 2000 maxblocks,6500
+kata-qemu,2,2,File Copy 1024 bufsize 2000 maxblocks,6600
