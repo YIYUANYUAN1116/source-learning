@@ -52,54 +52,54 @@ host /dev/dm-X -> QEMU -> virtio-scsi -> guest /dev/sdX -> kata-agent mount -> c
 
 ```mermaid
 flowchart LR
-    subgraph K8S[1. Kubernetes / CRI]
-        A1[Pod 创建请求<br/>RuntimeClass=kata<br/>容器：unixbench]
-        A2[RunPodSandbox<br/>创建 PodSandbox]
-        A3[CreateContainer<br/>创建业务容器 unixbench]
+    subgraph K8S["1. Kubernetes / CRI"]
+        A1["Pod 创建请求<br/>RuntimeClass=kata<br/>容器：unixbench"]
+        A2["RunPodSandbox<br/>创建 PodSandbox"]
+        A3["CreateContainer<br/>创建业务容器 unixbench"]
         A1 --> A2 --> A3
     end
 
-    subgraph CTD[2. containerd / devmapper snapshotter]
-        B0[containerd + devmapper snapshotter<br/>thin pool：containerd-devpool<br/>metadata：_tmeta<br/>data：_tdata]
-        B1[PodSandbox rootfs snapshot<br/>snapshotKey: sandbox<br/>thin snapshot -> /dev/dm-17<br/>ext4]
-        B2[业务容器 rootfs snapshot<br/>snapshotKey: unixbench<br/>thin snapshot -> /dev/dm-18<br/>ext4]
+    subgraph CTD["2. containerd / devmapper snapshotter"]
+        B0["containerd + devmapper snapshotter<br/>thin pool：containerd-devpool<br/>metadata：_tmeta<br/>data：_tdata"]
+        B1["PodSandbox rootfs snapshot<br/>snapshotKey: sandbox<br/>thin snapshot -> /dev/dm-17<br/>ext4"]
+        B2["业务容器 rootfs snapshot<br/>snapshotKey: unixbench<br/>thin snapshot -> /dev/dm-18<br/>ext4"]
         B0 --> B1
         B0 --> B2
     end
 
-    subgraph KATA[3. Kata runtime / shim]
-        C0[containerd-shim-kata-v2 / virtcontainers]
-        C1[读取 OCI / CRI 信息]
-        C2[识别 rootfs source 为块设备]
-        C3[判断 /dev/dm-17、/dev/dm-18 为 block rootfs]
-        C4[根据配置选择<br/>block_device_driver = virtio-scsi]
-        C5[为每个 rootfs 创建 Kata block device 对象]
-        C6[调用 QMP 热插块设备]
+    subgraph KATA["3. Kata runtime / shim"]
+        C0["containerd-shim-kata-v2 / virtcontainers"]
+        C1["读取 OCI / CRI 信息"]
+        C2["识别 rootfs source 为块设备"]
+        C3["判断 /dev/dm-17、/dev/dm-18 为 block rootfs"]
+        C4["根据配置选择<br/>block_device_driver = virtio-scsi"]
+        C5["为每个 rootfs 创建 Kata block device 对象"]
+        C6["调用 QMP 热插块设备"]
         C0 --> C1 --> C2 --> C3 --> C4 --> C5 --> C6
     end
 
-    subgraph QEMU[4. QEMU / Hypervisor]
-        D0[QEMU 启动虚机]
-        D1[virtio-scsi-pci controller<br/>启动时已存在]
-        D2[QMP blockdev-add<br/>把 /dev/dm-17、/dev/dm-18<br/>注册为 block backend]
-        D3[QMP device_add<br/>以 scsi disk 形式挂到<br/>已有 virtio-scsi controller 下]
-        D4[host /dev/dm-17<br/>-> guest /dev/sda]
-        D5[host /dev/dm-18<br/>-> guest /dev/sdb]
+    subgraph QEMU["4. QEMU / Hypervisor"]
+        D0["QEMU 启动虚机"]
+        D1["virtio-scsi-pci controller<br/>启动时已存在"]
+        D2["QMP blockdev-add<br/>把 /dev/dm-17、/dev/dm-18<br/>注册为 block backend"]
+        D3["QMP device_add<br/>以 scsi disk 形式挂到<br/>已有 virtio-scsi controller 下"]
+        D4["host /dev/dm-17<br/>-> guest /dev/sda"]
+        D5["host /dev/dm-18<br/>-> guest /dev/sdb"]
         D0 --> D1 --> D2 --> D3
         D3 --> D4
         D3 --> D5
     end
 
-    subgraph GUEST[5. Guest VM：guest kernel + kata-agent]
-        E1[guest kernel<br/>识别 virtio-scsi controller<br/>SCSI 扫描<br/>生成 /dev/sda、/dev/sdb]
-        E2[kata-agent<br/>等待块设备出现<br/>匹配 rootfs 对应 guest 设备<br/>mount ext4 rootfs<br/>准备 OCI rootfs<br/>调用 guest 内 runc/libcontainer]
+    subgraph GUEST["5. Guest VM：guest kernel + kata-agent"]
+        E1["guest kernel<br/>识别 virtio-scsi controller<br/>SCSI 扫描<br/>生成 /dev/sda、/dev/sdb"]
+        E2["kata-agent<br/>等待块设备出现<br/>匹配 rootfs 对应 guest 设备<br/>mount ext4 rootfs<br/>准备 OCI rootfs<br/>调用 guest 内 runc/libcontainer"]
         E1 --> E2
     end
 
-    subgraph CONTAINER[6. 容器视角]
-        F1[容器 mount namespace]
-        F2[/dev/sdb on / type ext4]
-        F3[根文件系统主体：block rootfs<br/>Kubernetes 注入文件：/etc/hosts、/etc/resolv.conf 等仍可走 virtio-fs]
+    subgraph CONTAINER["6. 容器视角"]
+        F1["容器 mount namespace"]
+        F2["/dev/sdb on / type ext4"]
+        F3["根文件系统主体：block rootfs<br/>Kubernetes 注入文件：/etc/hosts、/etc/resolv.conf 等仍可走 virtio-fs"]
         F1 --> F2 --> F3
     end
 
@@ -157,54 +157,54 @@ VM 启动时：
 
 ```mermaid
 flowchart LR
-    subgraph K8S[1. Kubernetes / CRI]
-        A1[Pod 创建请求<br/>RuntimeClass=kata<br/>容器：unixbench]
-        A2[RunPodSandbox<br/>创建 PodSandbox]
-        A3[CreateContainer<br/>创建业务容器 unixbench]
+    subgraph K8S["1. Kubernetes / CRI"]
+        A1["Pod 创建请求<br/>RuntimeClass=kata<br/>容器：unixbench"]
+        A2["RunPodSandbox<br/>创建 PodSandbox"]
+        A3["CreateContainer<br/>创建业务容器 unixbench"]
         A1 --> A2 --> A3
     end
 
-    subgraph CTD[2. containerd / devmapper snapshotter]
-        B0[containerd + devmapper snapshotter<br/>thin pool：containerd-devpool]
-        B1[PodSandbox rootfs snapshot<br/>thin snapshot -> /dev/dm-17<br/>ext4]
-        B2[业务容器 rootfs snapshot<br/>thin snapshot -> /dev/dm-18<br/>ext4]
-        B3[到这里正常：devmapper 已成功生成块设备]:::ok
+    subgraph CTD["2. containerd / devmapper snapshotter"]
+        B0["containerd + devmapper snapshotter<br/>thin pool：containerd-devpool"]
+        B1["PodSandbox rootfs snapshot<br/>thin snapshot -> /dev/dm-17<br/>ext4"]
+        B2["业务容器 rootfs snapshot<br/>thin snapshot -> /dev/dm-18<br/>ext4"]
+        B3["到这里正常：devmapper 已成功生成块设备"]:::ok
         B0 --> B1
         B0 --> B2
         B1 --> B3
         B2 --> B3
     end
 
-    subgraph KATA[3. Kata runtime / shim]
-        C0[containerd-shim-kata-v2 / virtcontainers]
-        C1[读取 OCI / CRI 信息]
-        C2[识别 /dev/dm-17、/dev/dm-18 为 block rootfs]
-        C3[根据配置选择<br/>block_device_driver = virtio-blk]
-        C4[为每个 rootfs 创建 Kata block device 对象]
-        C5[调用 QMP：先创建 block backend]
-        C6[再尝试热插 virtio-blk-pci 设备]
+    subgraph KATA["3. Kata runtime / shim"]
+        C0["containerd-shim-kata-v2 / virtcontainers"]
+        C1["读取 OCI / CRI 信息"]
+        C2["识别 /dev/dm-17、/dev/dm-18 为 block rootfs"]
+        C3["根据配置选择<br/>block_device_driver = virtio-blk"]
+        C4["为每个 rootfs 创建 Kata block device 对象"]
+        C5["调用 QMP：先创建 block backend"]
+        C6["再尝试热插 virtio-blk-pci 设备"]
         C0 --> C1 --> C2 --> C3 --> C4 --> C5 --> C6
     end
 
-    subgraph QEMU[4. QEMU / Hypervisor]
-        D0[QEMU 启动虚机]
-        D1[PCI 拓扑<br/>pcie-root-port<br/>pci-bridge-0: shpc=off]
-        D2[QMP blockdev-add<br/>把 /dev/dm-17 / /dev/dm-18<br/>注册为 backend<br/>这一步成功]:::ok
-        D3[QMP device_add<br/>driver = virtio-blk-pci<br/>bus = pci-bridge-0<br/>这一步失败]:::fail
-        D4[报错位置：<br/>Bus 'pci-bridge-0' does not support hotplugging]:::fail
-        D5[理论目标：host /dev/dm-18 -> guest /dev/vdb<br/>实际：未成功进入 guest]:::fail
+    subgraph QEMU["4. QEMU / Hypervisor"]
+        D0["QEMU 启动虚机"]
+        D1["PCI 拓扑<br/>pcie-root-port<br/>pci-bridge-0: shpc=off"]
+        D2["QMP blockdev-add<br/>把 /dev/dm-17 / /dev/dm-18<br/>注册为 backend<br/>这一步成功"]:::ok
+        D3["QMP device_add<br/>driver = virtio-blk-pci<br/>bus = pci-bridge-0<br/>这一步失败"]:::fail
+        D4["报错位置：<br/>Bus 'pci-bridge-0' does not support hotplugging"]:::fail
+        D5["理论目标：host /dev/dm-18 -> guest /dev/vdb<br/>实际：未成功进入 guest"]:::fail
         D0 --> D1 --> D2 --> D3 --> D4 --> D5
     end
 
-    subgraph GUEST[5. Guest VM：guest kernel + kata-agent]
-        E1[guest kernel<br/>未等到新的 virtio-blk rootfs 设备<br/>不会出现目标 /dev/vdX]:::warn
-        E2[kata-agent<br/>因为 QMP device_add 已失败<br/>没有可用的 guest rootfs 块设备<br/>后续匹配 / mount 无法继续]:::warn
+    subgraph GUEST["5. Guest VM：guest kernel + kata-agent"]
+        E1["guest kernel<br/>未等到新的 virtio-blk rootfs 设备<br/>不会出现目标 /dev/vdX"]:::warn
+        E2["kata-agent<br/>因为 QMP device_add 已失败<br/>没有可用的 guest rootfs 块设备<br/>后续匹配 / mount 无法继续"]:::warn
         E1 --> E2
     end
 
-    subgraph CONTAINER[6. 容器视角]
-        F1[容器 rootfs 未建立]:::fail
-        F2[预期：/dev/vdX on / type ext4<br/>实际：QMP 热插阶段失败<br/>结果：PodSandbox / 容器创建失败]:::fail
+    subgraph CONTAINER["6. 容器视角"]
+        F1["容器 rootfs 未建立"]:::fail
+        F2["预期：/dev/vdX on / type ext4<br/>实际：QMP 热插阶段失败<br/>结果：PodSandbox / 容器创建失败"]:::fail
         F1 --> F2
     end
 
@@ -285,54 +285,54 @@ Kata 启动前不一定知道：具体哪个容器 rootfs 对应哪个 /dev/dm-X
 
 ```mermaid
 flowchart LR
-    subgraph K8S[1. Kubernetes / CRI]
-        A1[Pod 创建请求<br/>RuntimeClass=kata<br/>容器：unixbench]
-        A2[RunPodSandbox<br/>创建 PodSandbox]
-        A3[CreateContainer<br/>创建业务容器 unixbench]
+    subgraph K8S["1. Kubernetes / CRI"]
+        A1["Pod 创建请求<br/>RuntimeClass=kata<br/>容器：unixbench"]
+        A2["RunPodSandbox<br/>创建 PodSandbox"]
+        A3["CreateContainer<br/>创建业务容器 unixbench"]
         A1 --> A2 --> A3
     end
 
-    subgraph CTD[2. containerd / devmapper snapshotter]
-        B0[containerd + devmapper snapshotter<br/>thin pool：containerd-devpool]
-        B1[PodSandbox rootfs snapshot<br/>-> /dev/dm-17<br/>-> ext4]
-        B2[业务容器 rootfs snapshot<br/>-> /dev/dm-18<br/>-> ext4]
-        B3[到这里正常：devmapper block rootfs 已准备好]:::ok
+    subgraph CTD["2. containerd / devmapper snapshotter"]
+        B0["containerd + devmapper snapshotter<br/>thin pool：containerd-devpool"]
+        B1["PodSandbox rootfs snapshot<br/>-> /dev/dm-17<br/>-> ext4"]
+        B2["业务容器 rootfs snapshot<br/>-> /dev/dm-18<br/>-> ext4"]
+        B3["到这里正常：devmapper block rootfs 已准备好"]:::ok
         B0 --> B1
         B0 --> B2
         B1 --> B3
         B2 --> B3
     end
 
-    subgraph KATA[3. Kata runtime / shim]
-        C0[containerd-shim-kata-v2 / virtcontainers]
-        C1[读取 OCI / CRI 信息]
-        C2[识别 /dev/dm-17、/dev/dm-18 为 block rootfs]
-        C3[选择 pmem 路线<br/>实验配置常写为 block_device_driver = nvdimm]
-        C4[为 rootfs 创建 NVDIMM / PMEM 设备描述]
-        C5[调用 QMP 试图添加 pmem 设备]
+    subgraph KATA["3. Kata runtime / shim"]
+        C0["containerd-shim-kata-v2 / virtcontainers"]
+        C1["读取 OCI / CRI 信息"]
+        C2["识别 /dev/dm-17、/dev/dm-18 为 block rootfs"]
+        C3["选择 pmem 路线<br/>实验配置常写为 block_device_driver = nvdimm"]
+        C4["为 rootfs 创建 NVDIMM / PMEM 设备描述"]
+        C5["调用 QMP 试图添加 pmem 设备"]
         C0 --> C1 --> C2 --> C3 --> C4 --> C5
     end
 
-    subgraph QEMU[4. QEMU / Hypervisor]
-        D0[QEMU 启动虚机]
-        D1[当前环境观测<br/>能看到 nvdimm<br/>看不到 virtio-pmem-pci<br/>nvdimm 参数列表不包含 pmem]
-        D2[尝试把 host /dev/dm-17、/dev/dm-18<br/>作为 pmem / nvdimm 路线加入虚机]
-        D3[QMP device_add / Add NVDIMM device]:::warn
-        D4[报错位置：Parameter 'pmem' is unexpected]:::fail
-        D5[日志现象：Failed to add NVDIMM device /dev/dm-17]:::fail
-        D6[理论目标：host /dev/dm-18 -> guest /dev/pmem0pX<br/>实际：未成功进入 guest]:::fail
+    subgraph QEMU["4. QEMU / Hypervisor"]
+        D0["QEMU 启动虚机"]
+        D1["当前环境观测<br/>能看到 nvdimm<br/>看不到 virtio-pmem-pci<br/>nvdimm 参数列表不包含 pmem"]
+        D2["尝试把 host /dev/dm-17、/dev/dm-18<br/>作为 pmem / nvdimm 路线加入虚机"]
+        D3["QMP device_add / Add NVDIMM device"]:::warn
+        D4["报错位置：Parameter 'pmem' is unexpected"]:::fail
+        D5["日志现象：Failed to add NVDIMM device /dev/dm-17"]:::fail
+        D6["理论目标：host /dev/dm-18 -> guest /dev/pmem0pX<br/>实际：未成功进入 guest"]:::fail
         D0 --> D1 --> D2 --> D3 --> D4 --> D5 --> D6
     end
 
-    subgraph GUEST[5. Guest VM：guest kernel + kata-agent]
-        E1[guest kernel<br/>没有成功收到新的 pmem rootfs 设备<br/>不会形成目标 /dev/pmemX 供容器 rootfs 使用]:::warn
-        E2[kata-agent<br/>因为 QMP 添加设备已失败<br/>没有可匹配的 pmem rootfs 设备<br/>无法继续 mount]:::warn
+    subgraph GUEST["5. Guest VM：guest kernel + kata-agent"]
+        E1["guest kernel<br/>没有成功收到新的 pmem rootfs 设备<br/>不会形成目标 /dev/pmemX 供容器 rootfs 使用"]:::warn
+        E2["kata-agent<br/>因为 QMP 添加设备已失败<br/>没有可匹配的 pmem rootfs 设备<br/>无法继续 mount"]:::warn
         E1 --> E2
     end
 
-    subgraph CONTAINER[6. 容器视角]
-        F1[容器 rootfs 未建立]:::fail
-        F2[预期：/dev/pmemX 或 /dev/pmemXp1 on /<br/>实际：QMP 参数阶段失败<br/>结果：PodSandbox / 容器创建失败]:::fail
+    subgraph CONTAINER["6. 容器视角"]
+        F1["容器 rootfs 未建立"]:::fail
+        F2["预期：/dev/pmemX 或 /dev/pmemXp1 on /<br/>实际：QMP 参数阶段失败<br/>结果：PodSandbox / 容器创建失败"]:::fail
         F1 --> F2
     end
 
